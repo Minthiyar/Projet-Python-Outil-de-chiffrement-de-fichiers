@@ -24,7 +24,7 @@ Ce projet est un outil de chiffrement de fichiers en Python, conçu pour protég
 Clonez le dépôt et installez les dépendances :
 
 ```bash
-git clone <url_du_dépôt>
+git clone https://github.com/Minthiyar/Projet-Python-Outil-de-chiffrement-de-fichiers.git
 cd Projet-Python-Outil-de-chiffrement-de-fichiers
 pip install -r requirements.txt
 ```
@@ -94,5 +94,5 @@ Ce projet est sous licence MIT. Consultez le fichier `LICENSE` pour plus d'infor
 ## Contact
 
 **Minthiyar**  
-- GitHub : [VotreProfilGitHub](https://github.com/votreprofil)
+- GitHub : https://github.com/Minthiyar
 - Email : votre.email@example.com
