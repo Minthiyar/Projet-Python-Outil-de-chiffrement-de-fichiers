@@ -2,14 +2,14 @@
 
 ## Description
 
-Ce projet est un outil de chiffrement de fichiers en Python, conçu pour protéger la confidentialité des données et faciliter le partage sécurisé des fichiers. Il permet aux utilisateurs de chiffrer et de déchiffrer des fichiers en utilisant des algorithmes de chiffrement robustes (comme AES, Serpent, et Twofish) ainsi que des algorithmes de hachage pour assurer l'intégrité des données (SHA-256, SHA-512, Whirlpool).
+Ce projet est un outil de chiffrement de fichiers en Python, conçu pour protéger la confidentialité des données et faciliter le partage sécurisé des fichiers. Il permet aux utilisateurs de chiffrer et de déchiffrer des fichiers en utilisant des algorithmes de chiffrement robustes (comme AES et Twofish) ainsi que des algorithmes de hachage pour assurer l'intégrité des données (SHA-256, SHA-512).
 
 ## Fonctionnalités
 
 - **Chiffrement de fichiers** : Chiffrez vos fichiers avec des algorithmes sécurisés pour empêcher tout accès non autorisé.
 - **Déchiffrement de fichiers** : Restaurez les fichiers chiffrés en utilisant la clé de déchiffrement appropriée.
 - **Génération de clés aléatoires** : Utilisez les mouvements de la souris pour générer des clés de manière aléatoire, offrant une sécurité unique et renforcée.
-- **Choix des algorithmes** : Sélectionnez entre AES, Serpent, et Twofish pour répondre à différents besoins en sécurité.
+- **Choix des algorithmes** : Sélectionnez entre AES et Twofish pour répondre à différents besoins en sécurité.
 - **Journal d'activité** : Enregistre les actions (chiffrement, déchiffrement, génération de clés) pour un suivi sécurisé.
 
 ## Installation
@@ -68,7 +68,15 @@ projet_chiffrement/
 ├── src/
 │   ├── main.py                 # Point d'entrée principal
 │   ├── encryption/             # Modules de chiffrement
+│   │   ├── aes_cipher.py       # Chiffrement AES
+│   │   ├── twofish_cipher.py   # Chiffrement Twofish
+│   │   ├── multi_layer.py      # Chiffrement multi-couches (AES + Twofish)
+│   │   └── __init__.py         # Initialisation du package
 │   └── utils/                  # Fonctions utilitaires
+│       ├── file_operations.py  # Opérations de fichiers
+│       ├── key_generation.py   # Génération de clés
+│       ├── config.py           # Configuration du projet
+│       └── __init__.py         # Initialisation du package utils
 ├── tests/                      # Tests unitaires
 ├── docs/                       # Documentation
 ├── data/                       # Fichiers d'exemple
@@ -95,4 +103,5 @@ Ce projet est sous licence MIT. Consultez le fichier `LICENSE` pour plus d'infor
 
 **Minthiyar**  
 - GitHub : https://github.com/Minthiyar
-- Email : votre.email@example.com
+- Email : mail@minthiyar.com
+

@@ -1,8 +1,18 @@
-keys/
-__pycache__/
+# Exclure les fichiers de clés
+keys/*
+!keys/README.md  # Garder un fichier README dans le dossier keys pour expliquer son usage
+
+# Exclure les fichiers temporaires
 *.pyc
-*.pyo
-.vscode/
-.idea/
+__pycache__/
+
+# Exclure les fichiers binaires
+*.bin
+
+# Exclure les environnements virtuels
 venv/
-.env
+.env/
+
+# Exclure les données sensibles et les logs
+data/
+logs/
