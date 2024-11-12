@@ -78,7 +78,6 @@ projet_chiffrement/
 │       ├── config.py           # Configuration du projet
 │       └── __init__.py         # Initialisation du package utils
 ├── tests/                      # Tests unitaires
-├── docs/                       # Documentation
 ├── data/                       # Fichiers d'exemple
 ├── keys/                       # Clés de chiffrement (à sécuriser)
 ├── requirements.txt            # Dépendances
