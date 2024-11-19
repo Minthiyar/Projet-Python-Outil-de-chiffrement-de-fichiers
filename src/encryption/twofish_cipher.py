@@ -6,10 +6,11 @@ class TwofishCipher:
         self.cipher = Twofish(self.key)
 
     def encrypt(self, data):
-        padded_data = data.ljust((len(data) + 15) // 16 * 16)  # Padding pour un bloc de 16 octets
+        # Ajout de padding manuel
+        padded_data = data.ljust((len(data) + 15) // 16 * 16)  # Multiple de 16 octets
         ciphertext = self.cipher.encrypt(padded_data)
         return ciphertext
 
     def decrypt(self, encrypted_data):
-        plaintext = self.cipher.decrypt(encrypted_data).rstrip()  # Retirer le padding
+        plaintext = self.cipher.decrypt(encrypted_data).rstrip()  # Suppression du padding
         return plaintext
