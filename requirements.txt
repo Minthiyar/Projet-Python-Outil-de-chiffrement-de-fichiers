@@ -1,4 +1,3 @@
 customtkinter==5.1.3  # Version recommandée pour le style moderne de l'interface
 pynput==1.7.6  # Dernière version compatible pour la capture des mouvements de souris
 pycryptodome==3.18.0  # Dernière version pour les algorithmes AES et outils liés
-twofish==0.3.0  # Implémentation de Twofish

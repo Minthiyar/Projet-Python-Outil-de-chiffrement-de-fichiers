@@ -1,11 +1,12 @@
+import os
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from Cryptodome.Cipher import AES
-from Cryptodome.Hash import SHA256, SHA512
-from Cryptodome.Protocol.KDF import PBKDF2
-from twofish import Twofish  # Ajouter le module Twofish
+from Cryptodome.Hash import SHA256
+from argon2 import PasswordHasher
+from argon2.low_level import Type
 from pynput import mouse
-import os
+
 
 # Classe pour capturer les mouvements de la souris
 class MouseDataCollector:
@@ -34,72 +35,78 @@ class MouseDataCollector:
     def get_data(self):
         return ''.join(f"{x}{y}" for x, y in self.coordinates)
 
-# Génération de clé
-def generate_key(password, salt, hash_algo):
-    if hash_algo == "SHA-256":
-        return PBKDF2(password, salt, dkLen=32, count=100000)
-    elif hash_algo == "SHA-512":
-        return PBKDF2(password, salt, dkLen=32, count=100000)
+
+# Hachage des données de souris
+def hash_mouse_data(mouse_data):
+    hasher = SHA256.new()
+    hasher.update(mouse_data.encode('utf-8'))
+    return hasher.digest()  # Retourne le haché sous forme binaire
+
+
+# Génération de clé avec Argon2
+def generate_key_argon2(password, hashed_mouse_data):
+    combined_data = password.encode('utf-8') + hashed_mouse_data
+    ph = PasswordHasher(
+        time_cost=2,
+        memory_cost=102400,  # Mémoire utilisée (en kB)
+        parallelism=8,       # Threads
+        type=Type.ID         # Version Argon2id
+    )
+    return ph.hash(combined_data)[:32].encode('utf-8')  # Troncature à 32 octets
+
 
 # Chiffrement AES
-def encrypt_file_aes(file_path, password, hash_algo):
+def encrypt_file_aes(file_path, password, hashed_mouse_data):
     salt = os.urandom(16)
-    key = generate_key(password, salt, hash_algo)
+    key = generate_key_argon2(password, hashed_mouse_data)
     cipher = AES.new(key, AES.MODE_EAX)
 
     with open(file_path, 'rb') as f:
         data = f.read()
     ciphertext, tag = cipher.encrypt_and_digest(data)
 
-    with open(file_path + ".enc", 'wb') as f_enc:
-        f_enc.write(salt + cipher.nonce + tag + ciphertext)
-    messagebox.showinfo("Succès", "Fichier chiffré avec AES avec succès !")
+    encrypted_path = file_path + ".enc"
+    with open(encrypted_path, 'wb') as f_enc:
+        # Stocke : Sel (16 octets) + Haché des données de souris (32 octets) + Nonce + Tag + Ciphertext
+        f_enc.write(salt)
+        f_enc.write(hashed_mouse_data)
+        f_enc.write(cipher.nonce)
+        f_enc.write(tag)
+        f_enc.write(ciphertext)
+
+    # Supprime le fichier original une fois chiffré
+    os.remove(file_path)
+
+    messagebox.showinfo("Succès", f"Fichier chiffré avec succès et remplacé par {encrypted_path}.")
+
 
 # Déchiffrement AES
-def decrypt_file_aes(file_path, password, hash_algo):
+def decrypt_file_aes(file_path, password):
     with open(file_path, 'rb') as f:
-        salt = f.read(16)
-        nonce = f.read(16)
-        tag = f.read(16)
-        ciphertext = f.read()
+        salt = f.read(16)  # Récupère le sel
+        hashed_mouse_data = f.read(32)  # Récupère le haché des données de souris
+        nonce = f.read(16)  # Récupère le nonce AES
+        tag = f.read(16)  # Récupère le tag d'intégrité
+        ciphertext = f.read()  # Récupère les données chiffrées
 
-    key = generate_key(password, salt, hash_algo)
+    key = generate_key_argon2(password, hashed_mouse_data)
     cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
-    data = cipher.decrypt_and_verify(ciphertext, tag)
+
+    try:
+        data = cipher.decrypt_and_verify(ciphertext, tag)
+    except ValueError:
+        messagebox.showerror("Erreur", "Échec du déchiffrement. Mot de passe ou données invalides.")
+        return
 
     decrypted_path = file_path.replace(".enc", "")
     with open(decrypted_path, 'wb') as f_dec:
         f_dec.write(data)
-    messagebox.showinfo("Succès", "Fichier déchiffré avec AES avec succès !")
 
-# Chiffrement Twofish
-def encrypt_file_twofish(file_path, password, hash_algo):
-    salt = os.urandom(16)
-    key = generate_key(password, salt, hash_algo)[:16]  # Twofish utilise une clé de 16 octets (128 bits)
-    cipher = Twofish(key)
+    # Supprime le fichier chiffré une fois déchiffré
+    os.remove(file_path)
 
-    with open(file_path, 'rb') as f:
-        data = f.read()
-    ciphertext = cipher.encrypt(data.ljust((len(data) + 15) // 16 * 16))  # Padding au multiple de 16 octets
+    messagebox.showinfo("Succès", f"Fichier déchiffré avec succès et restauré en tant que {decrypted_path}.")
 
-    with open(file_path + ".enc", 'wb') as f_enc:
-        f_enc.write(salt + ciphertext)
-    messagebox.showinfo("Succès", "Fichier chiffré avec Twofish avec succès !")
-
-# Déchiffrement Twofish
-def decrypt_file_twofish(file_path, password, hash_algo):
-    with open(file_path, 'rb') as f:
-        salt = f.read(16)
-        ciphertext = f.read()
-
-    key = generate_key(password, salt, hash_algo)[:16]
-    cipher = Twofish(key)
-    data = cipher.decrypt(ciphertext).rstrip()  # Suppression du padding
-
-    decrypted_path = file_path.replace(".enc", "")
-    with open(decrypted_path, 'wb') as f_dec:
-        f_dec.write(data)
-    messagebox.showinfo("Succès", "Fichier déchiffré avec Twofish avec succès !")
 
 # Application CustomTkinter
 class EncryptionApp:
@@ -111,6 +118,8 @@ class EncryptionApp:
         ctk.set_default_color_theme("blue")
 
         self.mouse_collector = MouseDataCollector()
+        self.mouse_data = ""
+        self.hashed_mouse_data = None
 
         # Titre
         self.title_label = ctk.CTkLabel(root, text="Outil de chiffrement V2", font=("Arial", 18, "bold"))
@@ -119,16 +128,6 @@ class EncryptionApp:
         # Entrée mot de passe
         self.password_entry = ctk.CTkEntry(root, placeholder_text="Entrez votre mot de passe", show="*", width=300)
         self.password_entry.pack(pady=10)
-
-        # Menu de sélection pour l'algorithme de hachage
-        self.hash_algo = ctk.StringVar(value="SHA-256")
-        self.hash_menu = ctk.CTkOptionMenu(root, variable=self.hash_algo, values=["SHA-256", "SHA-512"])
-        self.hash_menu.pack(pady=10)
-
-        # Menu déroulant pour sélectionner l'algorithme de chiffrement
-        self.encrypt_algo = ctk.StringVar(value="AES")
-        self.encrypt_menu = ctk.CTkOptionMenu(root, variable=self.encrypt_algo, values=["AES", "Twofish"])
-        self.encrypt_menu.pack(pady=10)
 
         # Barre de progression pour la souris
         self.progress_bar = ctk.CTkProgressBar(root, orientation="horizontal", mode="determinate", width=300)
@@ -162,41 +161,31 @@ class EncryptionApp:
     # Finaliser la collecte et activer le chiffrement
     def finish_data_generation(self):
         self.mouse_collector.stop_collection()
+        self.mouse_data = self.mouse_collector.get_data()
+        self.hashed_mouse_data = hash_mouse_data(self.mouse_data)  # Hache les données de souris
         self.encrypt_button.configure(state="normal")
-        messagebox.showinfo("Succès", "Données de la souris capturées avec succès !")
+        messagebox.showinfo("Succès", "Données de la souris capturées et hachées avec succès !")
 
     # Sélectionner un fichier à chiffrer
     def select_file_encrypt(self):
         file_path = filedialog.askopenfilename(title="Sélectionnez un fichier à chiffrer")
         if file_path:
             password = self.password_entry.get()
-            hash_algo = self.hash_algo.get()
-            algo = self.encrypt_algo.get()
             if not password:
                 messagebox.showwarning("Erreur", "Veuillez entrer un mot de passe.")
                 return
-            if algo == "AES":
-                encrypt_file_aes(file_path, password, hash_algo)
-            elif algo == "Twofish":
-                encrypt_file_twofish(file_path, password, hash_algo)
+            encrypt_file_aes(file_path, password, self.hashed_mouse_data)
 
     # Sélectionner un fichier à déchiffrer
     def select_file_decrypt(self):
         file_path = filedialog.askopenfilename(title="Sélectionnez un fichier à déchiffrer", filetypes=[("Encrypted Files", "*.enc")])
         if file_path:
             password = self.password_entry.get()
-            hash_algo = self.hash_algo.get()
-            algo = self.encrypt_algo.get()
             if not password:
                 messagebox.showwarning("Erreur", "Veuillez entrer un mot de passe.")
                 return
-            try:
-                if algo == "AES":
-                    decrypt_file_aes(file_path, password, hash_algo)
-                elif algo == "Twofish":
-                    decrypt_file_twofish(file_path, password, hash_algo)
-            except (ValueError, KeyError):
-                messagebox.showerror("Erreur", "Échec du déchiffrement. Mot de passe ou fichier invalide.")
+            decrypt_file_aes(file_path, password)
+
 
 # Lancer l'application
 if __name__ == "__main__":

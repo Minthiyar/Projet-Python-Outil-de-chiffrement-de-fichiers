@@ -2,15 +2,14 @@
 
 ## Description
 
-Ce projet est un outil de chiffrement de fichiers en Python, conçu pour protéger la confidentialité des données et faciliter le partage sécurisé des fichiers. Il permet aux utilisateurs de chiffrer et de déchiffrer des fichiers en utilisant des algorithmes de chiffrement robustes (comme AES et Twofish) ainsi que des algorithmes de hachage pour assurer l'intégrité des données (SHA-256, SHA-512).
+Ce projet est un outil de chiffrement de fichiers en Python, conçu pour protéger la confidentialité des données et faciliter le partage sécurisé des fichiers. Il utilise des algorithmes robustes comme AES pour chiffrer les fichiers et SHA-256 pour garantir l'intégrité des données.
 
 ## Fonctionnalités
 
-- **Chiffrement de fichiers** : Chiffrez vos fichiers avec des algorithmes sécurisés pour empêcher tout accès non autorisé.
-- **Déchiffrement de fichiers** : Restaurez les fichiers chiffrés en utilisant la clé de déchiffrement appropriée.
-- **Génération de clés aléatoires** : Utilisez les mouvements de la souris pour générer des clés de manière aléatoire, offrant une sécurité unique et renforcée.
-- **Choix des algorithmes** : Sélectionnez entre AES et Twofish pour répondre à différents besoins en sécurité.
-- **Journal d'activité** : Enregistre les actions (chiffrement, déchiffrement, génération de clés) pour un suivi sécurisé.
+- **Chiffrement de fichiers** : Protégez vos fichiers en utilisant AES avec une clé forte.
+- **Déchiffrement de fichiers** : Restaurez vos fichiers chiffrés à leur état original.
+- **Génération de clés uniques** : Capturez les mouvements de la souris pour générer des clés sécurisées et aléatoires.
+- **Remplacement de fichiers** : Le fichier original est automatiquement remplacé par son équivalent chiffré ou déchiffré.
 
 ## Installation
 
@@ -36,53 +35,13 @@ pip install -r requirements.txt
 Vous pouvez lancer le programme principal avec :
 
 ```bash
-python src/main.py
+python main.py
 ```
 
 ### Fonctionnalités principales
 
-1. **Chiffrement** : Choisissez un fichier et un algorithme de chiffrement, puis générez une clé de chiffrement unique.
-2. **Déchiffrement** : Fournissez le fichier chiffré et la clé pour restaurer le fichier original.
-3. **Gestion des clés** : Utilisez les mouvements de la souris pour générer des clés aléatoires, ou sauvegardez et restaurez des clés de manière sécurisée.
-
-## Exemple d’utilisation
-
-### Chiffrement d'un fichier
-
-```bash
-python src/main.py --encrypt --file <chemin_du_fichier> --algo AES
-```
-
-### Déchiffrement d'un fichier
-
-```bash
-python src/main.py --decrypt --file <chemin_du_fichier_chiffré> --key <clé>
-```
-
-## Arborescence du Projet
-
-Voici un aperçu de la structure du projet :
-
-```plaintext
-projet_chiffrement/
-├── src/
-│   ├── main.py                 # Point d'entrée principal
-│   ├── encryption/             # Modules de chiffrement
-│   │   ├── aes_cipher.py       # Chiffrement AES
-│   │   ├── twofish_cipher.py   # Chiffrement Twofish
-│   │   ├── multi_layer.py      # Chiffrement multi-couches (AES + Twofish)
-│   │   └── __init__.py         # Initialisation du package
-│   └── utils/                  # Fonctions utilitaires
-│       ├── file_operations.py  # Opérations de fichiers
-│       ├── key_generation.py   # Génération de clés
-│       ├── config.py           # Configuration du projet
-│       └── __init__.py         # Initialisation du package utils
-├── tests/                      # Tests unitaires
-├── data/                       # Fichiers d'exemple
-├── keys/                       # Clés de chiffrement (à sécuriser)
-├── requirements.txt            # Dépendances
-└── README.md                   # Ce fichier
-```
+1. **Chiffrement** : Choisissez un fichier, générez une clé unique et chiffrez vos données.
+2. **Déchiffrement** : Sélectionnez un fichier chiffré et restaurez-le avec le mot de passe utilisé.
 
 ## Contribuer
 
@@ -103,4 +62,3 @@ Ce projet est sous licence MIT. Consultez le fichier `LICENSE` pour plus d'infor
 **Minthiyar**  
 - GitHub : https://github.com/Minthiyar
 - Email : mail@minthiyar.com
-
