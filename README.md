@@ -61,4 +61,4 @@ Ce projet est sous licence MIT. Consultez le fichier `LICENSE` pour plus d'infor
 
 **Minthiyar**  
 - GitHub : https://github.com/Minthiyar
-- Email : mail@minthiyar.com
+- Email : github@minthiyar.com
